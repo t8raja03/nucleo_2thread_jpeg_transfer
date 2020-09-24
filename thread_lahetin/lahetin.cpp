@@ -47,15 +47,15 @@ void ekaThreadFunction()
 {
 	while(!lahetin1.init(1000,D7,transmitter_address))
 	{
-		pc.printf("trasmitter1 initialization failed\r\n");
+		pc.printf("ekaThreadFunction():trasmitter1 initialization failed\r\n");
 	}
-	pc.printf("lahtettimen lahetin alustettu\r\n");
+	pc.printf("ekaThreadFunction():lahtettimen lahetin alustettu\r\n");
 	
     while(!vastaanotin1.init(1000,D5,transmitter_receiver_address))
 	{
-		pc.printf("receiver1 initialization failed\r\n");
+		pc.printf("ekaThreadFunction():receiver1 initialization failed\r\n");
 	}
-	pc.printf("vastaanottimen vastaanotin1 alustettu\r\n");
+	pc.printf("ekaThreadFunction():vastaanottimen vastaanotin1 alustettu\r\n");
 	
 	    
     while(true)
@@ -65,7 +65,7 @@ void ekaThreadFunction()
 					
 		while(!lahetin1.send(transmitter_target_receiver_address,&message, sizeof(message)))
 		{
-			pc.printf("trasmitter sending failed\r\n");
+			pc.printf("ekaThreadFunction():trasmitter sending failed\r\n");
 		}
 		
 		kuittauskello1.reset();
@@ -83,7 +83,7 @@ void ekaThreadFunction()
 			//printMsg(msg);
 						
 						
-		    string msg("kuittauskello laukesi");
+		    string msg("ekaThreadFunction():kuittauskello laukesi");
 			printMsg(msg);
 
 			
@@ -91,6 +91,8 @@ void ekaThreadFunction()
 		}
         else           // saatiin kuittaus vastaanottajalta
 	    {
+			string msg("ekaThreadFunction():kuittaus vastaanotettu");
+			printMsg(msg);
             offset = offset + 50;
 			if(offset > 200)
 		    {
