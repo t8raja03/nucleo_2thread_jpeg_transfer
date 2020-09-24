@@ -95,7 +95,8 @@ void ekaThreadFunction()
 			printMsg(msg);
             offset = offset + 50;
 			if(offset > 200)
-		    {
+		    {	
+				pc.printf("1: Offset reset\n\r");
 				offset = 0;
 		    }
 			//printData(string((char *)&buffer1,koko));  // this prints data as integers
