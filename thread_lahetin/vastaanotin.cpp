@@ -6,7 +6,7 @@
 
     #include "ask_transmitter.h"
     ask_transmitter_t lahetin2;
-	char viesti2[]="ACKviesti";
+	char viesti2[]="2: ACKviesti";
 	uint8_t receiver_transmitter_address = 0x02;
 	uint8_t receiver_target_receiver_address = 0x01;
 	
@@ -34,15 +34,15 @@ void tokaThreadFunction()
 {
 	while(!lahetin2.init(1000,D6,receiver_transmitter_address))
 	{
-		pc.printf("trasmitter2 initialization failed\r\n");
+		pc.printf("2: trasmitter2 initialization failed\r\n");
 	}
-	pc.printf("lahtettimen lahetin alustettu\r\n");
+	pc.printf("2: lahtettimen lahetin alustettu\r\n");
 	
 	while(!vastaanotin2.init(1000,D4,receiver_receiver_address))
 	{
-		pc.printf("receiver2 initialization failed\r\n");
+		pc.printf("2: receiver2 initialization failed\r\n");
 	}
-	pc.printf("vastaanottimen vastaanotin2 alustettu\r\n");
+	pc.printf("2: vastaanottimen vastaanotin2 alustettu\r\n");
 	
 	    
     while(true)
@@ -65,7 +65,7 @@ void tokaThreadFunction()
 							
 		while(!lahetin2.send(receiver_target_receiver_address,&viesti2, sizeof(viesti2)))
 		{
-			pc.printf("trasmitter sending failed\r\n");
+			pc.printf("2: trasmitter sending failed\r\n");
 		}
 		
 
