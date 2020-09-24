@@ -24,6 +24,7 @@ int8_t * ptr = &buffer[0];
 
 int main()
 {
+	pc.printf("________________RESET____________________\n\r");
 	Thread EventThread(osPriorityAboveNormal);
 	EventThread.start(EventThreadFunction);
     ekaLahetin.start(ekaThreadFunction);
