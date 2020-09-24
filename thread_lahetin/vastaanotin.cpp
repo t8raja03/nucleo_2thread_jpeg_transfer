@@ -36,7 +36,7 @@ void tokaThreadFunction()
 	{
 		pc.printf("2: trasmitter2 initialization failed\r\n");
 	}
-	pc.printf("2: lahtettimen lahetin alustettu\r\n");
+	pc.printf("2: vastaanottimen lahetin2 alustettu\r\n");
 	
 	while(!vastaanotin2.init(1000,D4,receiver_receiver_address))
 	{
@@ -60,6 +60,19 @@ void tokaThreadFunction()
 		* sarjaväylälle. Ja tuo tulostus sitten nauhoitetaan
 		* puttyllä.
 		*/
+
+
+		/*******************************************************
+		 * *********************************************
+		 * ************************************************
+		 * Tämän toiminta hämmentää vielä
+		 * *******************************
+		 * ****************************
+		 * *******************************/
+		// Tulostetaan vastaanotetun viestin koko sarjamonitorille
+		int vastaanotetun_koko=sizeof(koko)*256;
+		pc.printf("2: vastaanotettu %i bittia:\n\r 2: ", vastaanotetun_koko);
+
 		printData(string((char *)&buffer2,koko)); // make a string by giving pointer to data and size of data	
 		                                          // and then deliver that string to printData function
 							

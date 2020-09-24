@@ -49,24 +49,32 @@ void ekaThreadFunction()
 	{
 		pc.printf("1: trasmitter1 initialization failed\r\n");
 	}
-	pc.printf("1: lahtettimen lahetin alustettu\r\n");
+	pc.printf("1: lahettimen lahetin1 alustettu\r\n");
 	
     while(!vastaanotin1.init(1000,D5,transmitter_receiver_address))
 	{
 		pc.printf("1: receiver1 initialization failed\r\n");
 	}
-	pc.printf("1: vastaanottimen vastaanotin1 alustettu\r\n");
-	
+	pc.printf("1: lahettimen vastaanotin1 alustettu\r\n");
+
+	// Tulostetaan viestin koko sarjaportille
+	int viestin_koko = sizeof(table)*8;
+	pc.printf("1: viestin koko=%i bittia\n\r", viestin_koko);
+
+	int pakettien_maara = 0;
 	    
     while(true)
 	{
         
 		kasaaPaketti(offset);
+		int paketin_koko = sizeof(message)*8;
 					
 		while(!lahetin1.send(transmitter_target_receiver_address,&message, sizeof(message)))
 		{
 			pc.printf("1: trasmitter sending failed\r\n");
 		}
+
+		pc.printf("1: Lahetetty paketti %i bittia\n\r", paketin_koko);
 		
 		kuittauskello1.reset();
 		kuittauskello1.start();
@@ -92,13 +100,15 @@ void ekaThreadFunction()
         else           // saatiin kuittaus vastaanottajalta
 	    {
 			string msg("1: kuittaus vastaanotettu");
+			pakettien_maara++;
 			printMsg(msg);
-            offset = offset + 50;
-			if(offset > 200)
+            offset = offset + PACKET_DATA_SIZE;
+			if(offset > (sizeof(table) - 50))
 		    {	
-				pc.printf("1: Offset reset\n\r");
-				offset = 0;
+				pc.printf("1: __________Offset reset, lahetettyja paketteja %i ________\n\r", pakettien_maara);
+				offset = pakettien_maara = 0;
 		    }
+			pc.printf("1: vastaanotettu: ");
 			//printData(string((char *)&buffer1,koko));  // this prints data as integers
 			printMsg(string((char *)&buffer1,koko));    // and this prints it as characters
 		}
