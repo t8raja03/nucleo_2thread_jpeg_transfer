@@ -2,7 +2,6 @@
 #include <iostream>
 #include <string>
 #include "main.h"
-#include <fstream>
 	
 
     #include "ask_transmitter.h"
@@ -25,31 +24,34 @@
 #define HEADER_SIZE 2
 #define PACKET_SIZE PACKET_DATA_SIZE+HEADER_SIZE
 
-uint16_t recv_offset = 0;
-int8_t data[3000];
+uint16_t recv_offset = 0;	// data-taulukon iteraattori
+int8_t data[3000];			// taulukko vastaanotetulle datalle
 
 void luePaketti() {
 
-	if ( (buffer2[0] >> 6) == 0) {
-		recv_offset = buffer2[0]*50;
-		for (int j=0; j<buffer2[1]; j++) {
-			data[recv_offset] = buffer2[j+2];
-			recv_offset++;
+	/* Tässä funktiossa kirjoitetaan vastaanotettu paketti data-taulukkoon*/
+
+	if ( (buffer2[0] >> 6) == 0) {				// Tarkistetaan, onko viimeisen paketin bitti 1
+		recv_offset = buffer2[0]*50;			// recv_offset on iteraattori, paketin järj.luku*50
+		for (int j=0; j<buffer2[1]; j++) {		
+			data[recv_offset] = buffer2[j+2];	// buffer2[] on vastaanotettu puskuri,
+			recv_offset++;						// 2 ensimmäistä alkiota ovat header
 		}
 	}
-	else {
+	else {										// Jos viimeisen paketin bitti == 1
 		recv_offset = (buffer2[0] - 64)*50;
 		for (int j=0; j<buffer2[1]; j++) {
 			data[recv_offset] = buffer2[j+2];
 			recv_offset++;
 		}
-		wait_us(1000000);
+		wait_us(1000000);			// Odotetaan sekunti, että datan tulostus tulee yhtenäisenä
 		pc.printf("2: viimeinen paketti vastaanotettu, data:\n\r");
+		// Tulostetaan koko data[]-taulukko
 		for (unsigned int k=0; k<recv_offset; k++) {
 			pc.printf("%i ", data[k]);
 		}
 		pc.printf("\n\r");
-		recv_offset = 0;
+		recv_offset = 0;		// Iteraattorin nollaus
 	}
 
 }
@@ -102,6 +104,8 @@ void tokaThreadFunction()
 			pc.printf("2: trasmitter sending failed\r\n");
 		}
 		
+		// kutsu vasta kuittausviestin jälkeen, jotta koko dataa tulostaessa ei tule 1. threadiltä
+		// "kuittauskello laukesi"-viestejä
 		luePaketti();
 
 		

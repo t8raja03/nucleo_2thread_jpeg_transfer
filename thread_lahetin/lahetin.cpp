@@ -40,14 +40,14 @@ void kasaaPaketti(int ptr)
 	 * Headerin (2 byteä) rakenne:
 	 * 
 	 * 			message[0]					  message[1]
-	 * 0   0   0   0   0   0   0   0   |    0 0 0 0 0 0 0 0 
-	 * 	   |   |-------------------|	    |-------------|
-	 * 	   |		    |				         * datan koko (int8_t, <128)
-	 * 	   |			 \
-	 * 	   |			  * paketin järjestysnumero (6 byteä, <64)
-	 *     | 			    (tiedetään, että paketteja on tässä tapauksessa vähemmän)
-	 * 	    \
-	 * 		 * viimeisen paketin lippu, 1 viimeisessä paketissa
+	 * 0 0 0 0 0 0 0 0   |    0 0 0 0 0 0 0 0 
+	 * 	 | |---------|	      |-------------|
+	 * 	 |		|				 * datan koko (int8_t, <128)
+	 * 	 |		 \
+	 * 	 |		   * paketin järjestysnumero (6 byteä, <64)
+	 *   | 			 (tiedetään, että paketteja on tässä tapauksessa vähemmän)
+	 * 	  \
+	 * 	   * viimeisen paketin lippu, 1 viimeisessä paketissa
 	*/
 
 	// Otetaan paketin alkukohta erilliseen muuttujaan muistiin
