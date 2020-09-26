@@ -153,6 +153,7 @@ void ekaThreadFunction()
 
 				pc.printf("1: __________Offset reset, lahetettyja paketteja %i ________\n\r", pakettien_maara);
 				offset = pakettien_maara = 0;
+				wait_us(10000*1000);
 		    }
 
 			// Tämä tulostaa vastaanottimen takaisin lähettämän kuittausviestin

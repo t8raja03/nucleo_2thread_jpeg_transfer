@@ -2,6 +2,7 @@
 #include <iostream>
 #include <string>
 #include "main.h"
+#include <fstream>
 	
 
     #include "ask_transmitter.h"
@@ -24,7 +25,34 @@
 #define HEADER_SIZE 2
 #define PACKET_SIZE PACKET_DATA_SIZE+HEADER_SIZE
 
+uint16_t recv_offset = 0;
+int8_t data[3000];
 
+void luePaketti() {
+
+	if ( (buffer2[0] >> 6) == 0) {
+		recv_offset = buffer2[0]*50;
+		for (int j=0; j<buffer2[1]; j++) {
+			data[recv_offset] = buffer2[j+2];
+			recv_offset++;
+		}
+	}
+	else {
+		recv_offset = (buffer2[0] - 64)*50;
+		for (int j=0; j<buffer2[1]; j++) {
+			data[recv_offset] = buffer2[j+2];
+			recv_offset++;
+		}
+		wait_us(1000000);
+		pc.printf("2: viimeinen paketti vastaanotettu, data:\n\r");
+		for (unsigned int k=0; k<recv_offset; k++) {
+			pc.printf("%i ", data[k]);
+		}
+		pc.printf("\n\r");
+		recv_offset = 0;
+	}
+
+}
 
 /*********************************************************************
 * Toka thread eli vastaanotin joka kokooaa vastaanotetut paketit
@@ -62,9 +90,9 @@ void tokaThreadFunction()
 		*/
 
 
-		// Tulostetaan vastaanotetun viestin koko sarjamonitorille
-		int vastaanotetun_koko=sizeof(buffer2);
-		pc.printf("2: vastaanotettu %i B:\n\r 2: ", vastaanotetun_koko);
+
+		// Tulostetaan vastaanotetun paketin data sarjamonitorille
+		pc.printf("2: vastaanotettu data:\n\r2: ");
 
 		printData(string((char *)&buffer2,koko)); // make a string by giving pointer to data and size of data	
 		                                          // and then deliver that string to printData function
@@ -74,6 +102,7 @@ void tokaThreadFunction()
 			pc.printf("2: trasmitter sending failed\r\n");
 		}
 		
+		luePaketti();
 
 		
 	}
