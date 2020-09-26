@@ -47,7 +47,7 @@ void luePaketti() {
 		wait_us(1000000);			// Odotetaan sekunti, että datan tulostus tulee yhtenäisenä
 		pc.printf("2: viimeinen paketti vastaanotettu, data:\n\r");
 		// Tulostetaan koko data[]-taulukko
-		for (unsigned int k=0; k<recv_offset; k++) {
+		for (unsigned int k=0; k<(recv_offset-1); k++) {
 			pc.printf("%i ", data[k]);
 		}
 		pc.printf("\n\r");
