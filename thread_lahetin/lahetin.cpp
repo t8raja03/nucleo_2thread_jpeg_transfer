@@ -25,18 +25,60 @@
 
 
 Timer kuittauskello1;
-int8_t message[PACKET_SIZE];
+int8_t message[PACKET_SIZE];		// message[] = paketti
 uint16_t offset = 0;
+
+int viestin_koko = sizeof(table);	// table-taulukon (pakattu_kuva.h) koko
+									// byteinä, koska taulukon alkiot on
+									// int8_t eli 8 bittisiä, kertoo myös alkioiden
+									// määrän
 
 
 void kasaaPaketti(int ptr)
-{
-	message[0] = 0xff;
-	message[1] = 0x5a;
+{	
+	/********************************************************
+	 * Headerin (2 byteä) rakenne:
+	 * 
+	 * 			message[0]					  message[1]
+	 * 0   0   0   0   0   0   0   0   |    0 0 0 0 0 0 0 0 
+	 * 	   |   |-------------------|	    |-------------|
+	 * 	   |		    |				         * datan koko (int8_t, <128)
+	 * 	   |			 \
+	 * 	   |			  * paketin järjestysnumero (6 byteä, <64)
+	 *     | 			    (tiedetään, että paketteja on tässä tapauksessa vähemmän)
+	 * 	    \
+	 * 		 * viimeisen paketin lippu, 1 viimeisessä paketissa
+	*/
+
+	// Otetaan paketin alkukohta erilliseen muuttujaan muistiin
+	uint8_t paketti_startptr = ptr;
+
+	// Headerin ensimmäiseen tavuun paketin järjestysnumero
+	message[0] = 0x00 + ( ptr / PACKET_DATA_SIZE );
+
+	// Kasataan paketin dataosio
 	for(int i = 0;i<PACKET_DATA_SIZE;i++)
-    {
-		message[HEADER_SIZE+i] = table[ptr++];
+	{
+		if ( ptr > (int)sizeof(table)) {
+			message[HEADER_SIZE+i] = 0x00;
+			// Viimeinenkin lähetetty paketti on 50 byteä,
+			// tässä laitetaan ylimääräiset nollaksi.
+			// ( ptr > table-taulukon alkioiden määrä)
+			}
+		else {
+			message[HEADER_SIZE+i] = table[ptr++];
+		}
 	}
+
+	// Paketin toinen byte on datapaketin koko
+	message[1] = ptr - paketti_startptr;
+
+	// Jos ptr > table-taulun (pakattu_kuva.h) alkioiden määrä
+	// laitetaan lippu merkiksi viimeisestä paketista
+	if ( ptr > (int)sizeof(table) ) {
+		message[0] += (1 << 6);
+	}
+
 }
 
 
@@ -58,23 +100,23 @@ void ekaThreadFunction()
 	pc.printf("1: lahettimen vastaanotin1 alustettu\r\n");
 
 	// Tulostetaan viestin koko sarjaportille
-	int viestin_koko = sizeof(table)*8;
-	pc.printf("1: viestin koko=%i bittia\n\r", viestin_koko);
+	pc.printf("1: viestin koko=%i B\n\r", viestin_koko);
 
+	// Lähetettyjen 
 	int pakettien_maara = 0;
 	    
     while(true)
 	{
         
 		kasaaPaketti(offset);
-		int paketin_koko = sizeof(message)*8;
+		int paketin_koko = sizeof(message); // Lähetettävän paketin koko (byteä)
 					
 		while(!lahetin1.send(transmitter_target_receiver_address,&message, sizeof(message)))
 		{
 			pc.printf("1: trasmitter sending failed\r\n");
 		}
 
-		pc.printf("1: Lahetetty paketti %i bittia\n\r", paketin_koko);
+		pc.printf("1: Lahetetty paketti %i B\n\r", paketin_koko); // helpottamaan seuraamista
 		
 		kuittauskello1.reset();
 		kuittauskello1.start();
@@ -103,11 +145,18 @@ void ekaThreadFunction()
 			pakettien_maara++;
 			printMsg(msg);
             offset = offset + PACKET_DATA_SIZE;
-			if(offset > (sizeof(table) - 50))
+			if(offset > (sizeof(table)))
 		    {	
+				// kun offset > table-taulun alkioiden määrä, eli
+				// viimeinen paketti on kasattu,
+				// tulostetaan sarjaportille tieto helpottamaan seuraamista
+
 				pc.printf("1: __________Offset reset, lahetettyja paketteja %i ________\n\r", pakettien_maara);
 				offset = pakettien_maara = 0;
 		    }
+
+			// Tämä tulostaa vastaanottimen takaisin lähettämän kuittausviestin
+			// sarjaportille
 			pc.printf("1: vastaanotettu: ");
 			//printData(string((char *)&buffer1,koko));  // this prints data as integers
 			printMsg(string((char *)&buffer1,koko));    // and this prints it as characters

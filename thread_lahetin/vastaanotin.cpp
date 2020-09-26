@@ -62,16 +62,9 @@ void tokaThreadFunction()
 		*/
 
 
-		/*******************************************************
-		 * *********************************************
-		 * ************************************************
-		 * Tämän toiminta hämmentää vielä
-		 * *******************************
-		 * ****************************
-		 * *******************************/
 		// Tulostetaan vastaanotetun viestin koko sarjamonitorille
-		int vastaanotetun_koko=sizeof(koko)*256;
-		pc.printf("2: vastaanotettu %i bittia:\n\r 2: ", vastaanotetun_koko);
+		int vastaanotetun_koko=sizeof(buffer2);
+		pc.printf("2: vastaanotettu %i B:\n\r 2: ", vastaanotetun_koko);
 
 		printData(string((char *)&buffer2,koko)); // make a string by giving pointer to data and size of data	
 		                                          // and then deliver that string to printData function
